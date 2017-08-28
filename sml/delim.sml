@@ -27,9 +27,12 @@ fun pop st = case !st of
 
 functor Control (type ans) : CONTROL = struct
   type ans = ans
-  type stack = Universal.u list
+  datatype frame = RET of Universal.u | ENTER
+  type stack = frame list
   type reset_stack = ((unit -> ans) * stack * stack) list
 
+
+                                                     
   exception Done of ans
   exception MissingFun
 
@@ -57,18 +60,24 @@ functor Control (type ans) : CONTROL = struct
   fun reset f = invoke_cont f []
 
   fun shift f = case pop replay_stack of
-    (SOME v) => (push record_stack v;
-                 Universal.from_u v)
-  | NONE     =>
+    (SOME (RET v)) => (push record_stack (RET v);
+                       Universal.from_u v)
+  | _     =>
     let val st = !record_stack
         val g = !cur_fun in
-        raise (Done (f (fn v => invoke_cont g (Universal.to_u v :: st))))
+        (push record_stack ENTER;
+         raise (Done (f (fn v => invoke_cont g (RET (Universal.to_u v) :: st)))))
     end
 end;
 
 structure C = Control(type ans = int);
 
 val exC = 1 + C.reset (fn () => 2 * (C.shift (fn k => k (k (5)))));
+
+(* Should return 37 *)
+val exNest1 = 1 + C.reset (fn () => 2 + C.shift (fn k =>  3*(C.shift (fn l => l (k 10))) ));
+val exNest2 = 1 + C.reset (fn () => 2 + C.shift (fn k =>  3*(C.shift (fn l => l 10)) ));
+val exNest3 = 1 + C.reset (fn () => 2 + C.shift (fn k =>  3*(C.shift (fn l => k 10)) ));
 
 signature MONAD = sig
     type 'a m
@@ -117,7 +126,6 @@ fun fail () = amb []
 val rsF = N.reify (fn () => let val x = amb [3,4] * amb [5,7] in
                                  if x >= 20 then x
                                  else fail () end);
-
 
 functor ContMonad (type ans) : MONAD = struct
   type 'a m = ('a -> ans) -> ans
