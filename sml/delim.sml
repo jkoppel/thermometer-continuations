@@ -79,6 +79,10 @@ val exNest1 = 1 + C.reset (fn () => 2 + C.shift (fn k =>  3*(C.shift (fn l => l 
 val exNest2 = 1 + C.reset (fn () => 2 + C.shift (fn k =>  3*(C.shift (fn l => l 10)) ));
 val exNest3 = 1 + C.reset (fn () => 2 + C.shift (fn k =>  3*(C.shift (fn l => k 10)) ));
 
+val exNest4 =  C.reset (fn () => 
+                  C.shift (fn k =>  3*(C.shift (fn l => l (k 10))))
+                  * (C.shift (fn k => k 5 + k 6)));
+
 signature MONAD = sig
     type 'a m
     val return : 'a -> 'a m;
