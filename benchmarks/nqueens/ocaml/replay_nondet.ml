@@ -10,13 +10,15 @@ let rec decr = function
   | (n::ns) -> (n-1)::ns
   | []      -> []
 
-let rec withNondeterminism f =
-  let v = try [f()] with Empty -> [] in
-  br_idx := decr (!br_idx);
-  pos := length (!br_idx);
-  match !br_idx with
-    [] -> v
-  |  _  -> v @ withNondeterminism f
+let withNondeterminism f =
+  let rec loop acc f =
+    let v = try [f()] with Empty -> [] in
+    br_idx := decr (!br_idx);
+    pos := length (!br_idx);
+    match !br_idx with
+    | [] -> List.rev acc
+    |  _  -> loop (List.rev_append v acc) f
+  in loop [] f
 
 let choose = function
   | [] -> raise Empty
