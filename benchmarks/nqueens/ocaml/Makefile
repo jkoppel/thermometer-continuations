@@ -16,5 +16,12 @@ delimcc:
 	@echo "/!\\ the bytecode version (.byte) may be faster"
 	@echo "/!\\ than the native one (.native), you should test both"
 
+effect:
+	@echo "/!\\ the effect-handling benchmark requires the experimental ocaml-multicore runtime"
+	opam switch show | grep multicore > /dev/null \
+	  || (echo "missing multicore runtime; see https://github.com/ocamllabs/ocaml-effects-tutorial#setting-up"; \
+	      exit 1)
+	$(OCAMLBUILD) effect_nondet.native
+
 clean:
 	$(OCAMLBUILD) -classic-display -clean
