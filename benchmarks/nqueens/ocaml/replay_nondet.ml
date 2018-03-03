@@ -13,11 +13,12 @@ let rec decr = function
 let withNondeterminism f =
   let rec loop acc f =
     let v = try [f()] with Empty -> [] in
+    let acc = v @ acc in
     br_idx := decr (!br_idx);
     pos := length (!br_idx);
     match !br_idx with
     | [] -> List.rev acc
-    |  _  -> loop (List.rev_append v acc) f
+    |  _  -> loop acc f
   in loop [] f
 
 let choose = function
