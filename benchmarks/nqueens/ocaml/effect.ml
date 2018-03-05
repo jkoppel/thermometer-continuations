@@ -13,27 +13,29 @@ let withNonDeterminism m =
 let choose li = perform (Choose li)
 let fail () = perform (Choose [])
 
-let rec range ?(start=0) len =
-    if start >= len
-    then []
-    else start :: (range len ~start:(start+1))
+let n = int_of_string Sys.argv.(1)
+
+let range =
+  let rec range i =
+    if i = n then []
+    else i :: range (i + 1)
+  in range 0
 
 let rec okay i c = function
   | [] -> true
   | x::xs -> c <> x && (c-x) <> i && (c-x) <> -i && okay (i+1) c xs
 
-let rec enum_nqueens n i l =
-  if i = n then l
+let rec enum_nqueens i l =
+  if i = n then
+    l
   else begin
-    let c = choose (range n) in
-    if okay 1 c l then
-      enum_nqueens n (i+1) (c :: l)
-    else
-      fail ()
+    let c = choose range in
+    if not (okay 1 c l) then fail();
+    enum_nqueens (i + 1) (c :: l)
   end
 
+let solutions = withNondeterminism (fun () -> enum_nqueens 0 [])
+
 let () =
-  let n = int_of_string (Array.get Sys.argv 1) in
-  let li = withNonDeterminism (fun () -> enum_nqueens n 0 []) in
-  print_int (List.length li);
+  print_int (List.length solutions);
   print_newline ()
