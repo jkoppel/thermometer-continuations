@@ -1,8 +1,12 @@
+TARGETS=indirect.native \
+  replay.native replay_dynarray.native replay_optimized.native \
+  thermometers_generic.native thermometers_optimized.native
+
 all:
-	@echo "/!\\ the delimcc benchmark is not build by default"
-	@echo "/!\\ as it requires the delimcc library"
-	@echo "/!\\ add 'make delimcc' to build it"
-	ocamlbuild indirect.native replay.native replay_dynarray.native replay_optimized.native thermometers_optimized.native
+	@echo "/!\\ the delimcc and effect benchmark are not built by default"
+	@echo "/!\\ as they require external runtime/libraries"
+	@echo "/!\\ see 'make delimcc', 'make effect'"
+	ocamlbuild $(TARGETS)
 
 delimcc:
 	@echo "/!\\ the delimcc benchmark requires the 'delimcc' library"
