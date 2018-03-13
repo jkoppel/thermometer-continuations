@@ -2,7 +2,7 @@ all:
 	@echo "/!\\ the delimcc benchmark is not build by default"
 	@echo "/!\\ as it requires the delimcc library"
 	@echo "/!\\ add 'make delimcc' to build it"
-	ocamlbuild indirect.native replay.native replay_dynarray.native replay_optimized.native thermometers.native
+	ocamlbuild indirect.native replay.native replay_dynarray.native replay_optimized.native thermometers_optimized.native
 
 delimcc:
 	@echo "/!\\ the delimcc benchmark requires the 'delimcc' library"
