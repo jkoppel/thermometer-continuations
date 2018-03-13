@@ -18,9 +18,9 @@ end
 
 
 module Universal : UNIVERSAL = struct
-  type u = U1 | U2 of int
-  let to_u = Obj.magic
-  let from_u = Obj.magic
+  type u = Obj.t
+  let to_u = Obj.repr
+  let from_u = Obj.obj
 end
 
 let f_to_u f x = Universal.to_u (f (Universal.from_u x))

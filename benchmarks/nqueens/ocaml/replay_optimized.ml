@@ -5,9 +5,9 @@ module type UNIVERSAL = sig
 end
 
 module Universal : UNIVERSAL = struct
-  type u = U1 | U2 of int
-  let to_u = Obj.magic
-  let from_u = Obj.magic
+  type u = Obj.t
+  let to_u = Obj.repr
+  let from_u = Obj.obj
 end
 
 let (br_idx : Universal.u list list ref) = ref [];;
