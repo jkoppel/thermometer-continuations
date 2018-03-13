@@ -26,7 +26,7 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
   let reify t =
     Delimcc.push_prompt prompt (fun () -> M.return (t ()))
   let reflect m =
-    Delimcc.shift0 prompt (fun k -> M.bind m k)
+    Delimcc.shift prompt (fun k -> M.bind m k)
 end
 
 module ListMonad : (MONAD with type 'a m = 'a list) = struct

@@ -14,7 +14,7 @@ delimcc:
 	@#delimcc does not work under OCaml 4.06
 	@ocamlc -version | grep -v 4.06 > /dev/null \
 	  || (echo "unsupported OCaml version $$(ocamlc -version)"; exit 1)
-	ocamlbuild -use-ocamlfind -package delimcc delimcc.byte delimcc.native
+	ocamlbuild -use-ocamlfind -package delimcc filinski_delimcc.byte filinski_delimcc.native
 	@echo "/!\\ the bytecode version (.byte) may be faster"
 	@echo "/!\\ than the native one (.native), you should test both"
 
