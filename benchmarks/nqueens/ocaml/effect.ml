@@ -11,7 +11,6 @@ let withNondeterminism m =
     List.flatten vs
 
 let choose li = perform (Choose li)
-let fail () = perform (Choose [])
 
 let n = int_of_string Sys.argv.(1)
 
@@ -29,8 +28,7 @@ let rec enum_nqueens i l =
   if i = n then
     l
   else begin
-    let c = choose range in
-    if not (okay 1 c l) then fail();
+    let c = choose (List.filter (fun c -> okay 1 c l) range) in
     enum_nqueens (i + 1) (c :: l)
   end
 

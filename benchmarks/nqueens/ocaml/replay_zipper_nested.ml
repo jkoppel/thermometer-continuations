@@ -41,22 +41,20 @@ let withNondeterminism f =
   end
 
 let choose = function
-  | [||] -> raise Empty
+  | [] -> raise Empty
   | xs ->
     match pop future with
     | Some idx ->
       push past idx;
-      xs.((Array.length xs - 1) - idx)
+      List.nth xs ((List.length xs - 1) - idx)
     | None ->
-      let idx = (Array.length xs - 1) in
+      let idx = (List.length xs - 1) in
       push past idx;
-      xs.(0)
-
-let fail () = choose [||]
+      List.hd xs
 
 let n = int_of_string Sys.argv.(1)
 
-let range = Array.init n (fun i -> i)
+let range = Array.to_list (Array.init n (fun i -> i))
 
 let rec okay i c = function
   | [] -> true
@@ -66,10 +64,7 @@ let rec enum_nqueens i l =
   if i = n then
     l
   else begin
-    let c = choose range in
-    (* (* this implementation is nesting-safe: *)
-    List.iter ignore (withNondeterminism (fun () -> choose [|(); (); ()|])); *)
-    if not (okay 1 c l) then fail();
+    let c = choose ( (List.filter (fun c -> okay 1 c l) range)) in
     enum_nqueens (i + 1) (c :: l)
   end
 
