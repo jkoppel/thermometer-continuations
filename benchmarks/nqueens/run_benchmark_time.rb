@@ -10,8 +10,13 @@ UPPERBOUND = 12
 
 TRIALS = 5
 
-
-puts cmd
+# we use the presence of a second command-line parameter
+# as a switch to a LaTeX-friendly output
+if ARGV[1].nil? then
+  puts cmd
+else
+  puts "\\header{#{ARGV[1]}}"
+end
 LOWERBOUND.upto(UPPERBOUND) do |n|
   tot = 0.0
 
@@ -23,6 +28,10 @@ LOWERBOUND.upto(UPPERBOUND) do |n|
     tot += (m[1].to_i * 60 + m[2].to_f) * 1000
   end
   avg = tot / TRIALS
-  puts "#{n}: #{avg}"
+  if ARGV[1].nil? then
+    puts "#{n}: #{avg}"
+  else
+    puts "\\point{#{n}}{#{avg}}"
+  end
 end
 
