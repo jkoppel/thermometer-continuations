@@ -38,7 +38,6 @@ point	11	1598
 point	12	601454
 end-benchmark
 
-
 begin-benchmark	ThermOCaml
 script	"./ocaml/thermometers_generic.native"
 header	Therm. (OCaml)
@@ -47,6 +46,16 @@ point	9	28.0
 point	10	124.0
 point	11	685.0
 point	12	4331.0
+end-benchmark
+
+begin-benchmark	ThermSML
+script	"thermometers.sml"
+header	Therm. (SML/NJ)
+point	8	8
+point	9	36
+point	10	200
+point	11	1289
+point	12	7342
 end-benchmark
 
 begin-benchmark	OptThermOCaml
