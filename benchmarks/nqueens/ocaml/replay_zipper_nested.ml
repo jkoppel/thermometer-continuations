@@ -8,6 +8,8 @@ let pop r = match !r with
   | [] -> None
   | x::xs -> r := xs; Some x
 
+let nest : (int list * int list) list ref = ref []
+
 let rec decr = function
   | (0::ns) -> decr ns
   | (n::ns) -> (n-1)::ns
@@ -16,6 +18,8 @@ let rec decr = function
 exception Empty;;
 
 let withNondeterminism f =
+  push nest (!past, !future);
+  past := []; future := [];
   let rec loop acc f =
     let v = try [f()] with Empty -> [] in
     let acc = v @ acc in
@@ -27,7 +31,14 @@ let withNondeterminism f =
     then List.rev acc
     else loop acc f
   in
-  loop [] f
+  let result = loop [] f in
+  begin match pop nest with
+    | None -> assert false
+    | Some (p, f) ->
+      past := p;
+      future := f;
+      result
+  end
 
 let choose = function
   | [||] -> raise Empty
@@ -37,7 +48,7 @@ let choose = function
       push past idx;
       xs.((Array.length xs - 1) - idx)
     | None ->
-      let idx = Array.length xs - 1 in
+      let idx = (Array.length xs - 1) in
       push past idx;
       xs.(0)
 
@@ -56,6 +67,8 @@ let rec enum_nqueens i l =
     l
   else begin
     let c = choose range in
+    (* (* this implementation is nesting-safe: *)
+    List.iter ignore (withNondeterminism (fun () -> choose [|(); (); ()|])); *)
     if not (okay 1 c l) then fail();
     enum_nqueens (i + 1) (c :: l)
   end

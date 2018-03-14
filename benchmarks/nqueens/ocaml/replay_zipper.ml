@@ -62,6 +62,8 @@ let rec enum_nqueens i l =
     l
   else begin
     let c = choose range in
+    (* (* this implementation is not nesting-safe: *)
+    List.iter ignore (withNondeterminism (fun () -> choose [(); (); ()])); *)
     if not (okay 1 c l) then fail();
     enum_nqueens (i + 1) (c :: l)
   end
