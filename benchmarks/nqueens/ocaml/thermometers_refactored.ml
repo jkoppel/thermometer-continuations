@@ -49,10 +49,10 @@ module Control (A : Answer) : CONTROL with type ans = A.ans = struct
      let res = try f () with Done x -> x in
      match pop reset_stack with
      | None -> assert false
-     | Some (f', rec_stack', rep_stack') ->
-       cur_fun := f';
-       record_stack := rec_stack';
-       replay_stack := rep_stack';
+     | Some (future, record, replay) ->
+       cur_fun := future;
+       record_stack := record;
+       replay_stack := replay;
        res
 
   let reset f = invoke_cont f []
