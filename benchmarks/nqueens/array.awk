@@ -14,7 +14,9 @@ BEGIN { FS="\t" }
   if (SEC < 60) {
     TIME=SEC"s"
   } else {
-    TIME=int(SEC/60)"m"(SEC-60)"s"
+    MIN=int(SEC/60)
+    SEC=SEC-MIN*60
+    TIME=MIN"m"SEC"s"
   }
   print "& "TIME
 }

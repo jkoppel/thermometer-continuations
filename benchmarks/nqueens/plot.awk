@@ -44,7 +44,20 @@ BEGIN { FS="\t" }
 }
 /end-benchmark/ && KEEP {
   print "};"
-  # print "\\node[above] at (axis cs: "X", "Y") {"Y"};"
+
+  # gather time label to put on last node
+  N=X
+  SEC=Y
+  if (SEC < 60) {
+    TIME=SEC"s"
+  } else {
+    MIN=int(SEC/60)
+    SEC=SEC-MIN*60
+    TIME=MIN"m"SEC"s"
+  }
+  if (ONLYSML || NOSML) {
+    print "\\node[above] at (axis cs: "N", "Y") {"TIME"};"
+  }
   print "\\addlegendentry{"LABEL"}"
   print ""
 }
