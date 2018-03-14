@@ -1,6 +1,6 @@
 effect Choose : 'a list -> 'a
 
-let withNonDeterminism m =
+let withNondeterminism m =
   match m () with
   | v -> [v]
   | effect (Choose li) k ->

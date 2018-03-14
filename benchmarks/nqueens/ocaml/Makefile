@@ -24,7 +24,7 @@ effect:
 	@opam switch show | grep multicore > /dev/null \
 	  || (echo "/!\\ the current switch ($$(opam switch show)) lacks the multicore runtime; see https://github.com/ocamllabs/ocaml-effects-tutorial#setting-up"; \
 	      exit 1)
-	ocamlbuild effect_nondet.native
+	ocamlbuild effect.native
 
 clean:
 	ocamlbuild -classic-display -clean
