@@ -2,25 +2,26 @@
 file = ARGV[0]
 
 LOWERBOUND = 4
-UPPERBOUND = 12
 
 TRIALS = 5
 
-# we use the presence of a second command-line parameter
-# as a switch to a LaTeX-friendly output
+# the second argument, if it exists, determines the upper bound
 if ARGV[1].nil? then
-  puts file
+  UPPERBOUND = 12
 else
-  puts "\\header{#{ARGV[1]}}"
+  UPPERBOUND = ARGV[1].to_i
 end
+
+puts "script\t\"#{file}\""
+
+unless ARGV[2].nil?
+  puts "header\t\"#{ARGV[2]}\""
+end
+
 LOWERBOUND.upto(UPPERBOUND) do |n|
   tot = 0.0
   TRIALS.times { tot += `sml #{file} #{n}`.lines[-1].to_i }
-  avg = tot / TRIALS
-  if ARGV[1].nil? then
-    puts "#{n}: #{avg}"
-  else
-    puts "\\point{#{n}}{#{avg}}"
-  end
+  avg = 1 + tot / TRIALS
+  puts "point\t#{n}\t#{avg}"
 end
 
