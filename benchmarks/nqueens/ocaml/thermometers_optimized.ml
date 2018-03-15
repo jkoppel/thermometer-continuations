@@ -1,6 +1,4 @@
-type 'b fcont = {k : 'c. ('b -> 'c) -> 'c}
-
-let runf f x k = (f x).k k
+type 'b fcont = {run : 'c. ('b -> 'c) -> 'c}
 
 module type MONAD = sig
     type 'a m
@@ -16,11 +14,10 @@ module type UNIVERSAL = sig
   val from_u : u -> 'a
 end
 
-
 module Universal : UNIVERSAL = struct
-  type u = U1 | U2 of int
-  let to_u = Obj.magic
-  let from_u = Obj.magic
+  type u = Obj.t
+  let to_u = Obj.repr
+  let from_u = Obj.obj
 end
 
 let f_to_u f x = Universal.to_u (f (Universal.from_u x))
@@ -51,7 +48,7 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
   let len = ref 0
 
   let (stack : stack ref) = ref []
-  let (cont : (Universal.u -> Universal.u) ref) = ref (fun x -> raise (Done x))
+  let (cont : (Universal.u -> Universal.u) ref) = ref (fun x -> assert false)
 
   let reflect m =
     if !pos < !len then
@@ -60,13 +57,17 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
     else
       let st = !stack in
       bind m
-        (fun x -> {k = fun k -> cont := f_to_u k;
-                                raise (Throw ((Universal.to_u x) :: st))})
+        (fun x ->
+           let run k =
+             cont := f_to_u k;
+             raise (Throw ((Universal.to_u x) :: st))
+           in {run})
         (f_from_u (!cont))
 
   let rec reify_helper f =
     try
-      (f_from_u (!cont)) (return (f ()))
+      let v = f () in
+      f_from_u !cont (return v)
     with
     | (Throw st) ->
         pos := 0;
@@ -83,8 +84,6 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
     reify_helper f
 end
 
-
-
 module ListMonad : (MONAD with type 'a m = 'a list) = struct
   type 'a m = 'a list
 
@@ -92,8 +91,7 @@ module ListMonad : (MONAD with type 'a m = 'a list) = struct
 
   let rec bind l f k = match l with
     []      -> k []
-  | (x::xs) -> runf f x (fun a -> bind xs f
-                                    (fun b -> k (a @ b)))
+  | (x::xs) -> (f x).run (fun a -> bind xs f (fun b -> k (a @ b)))
 end
 
 module N = Represent(struct

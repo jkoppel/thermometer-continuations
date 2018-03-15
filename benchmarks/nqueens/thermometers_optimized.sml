@@ -110,34 +110,39 @@ val withNondeterminism = N.reify
 fun choose xs = N.reflect xs
 fun fail () = choose []
                  
-
+val n = valOf (Int.fromString (hd (CommandLine.arguments ())))
 
 fun range start len =
   if start >= len
   then []
   else start :: (range (start+1) len)
 
+val board_range = range 0 n
+
 fun okay i c []      = true
   | okay i c (x::xs) = c <> x andalso (c-x) <> i andalso (c-x) <> (~i) andalso okay (i+1) c xs
                    
-fun enum_nqueens n i l =
+fun enum_nqueens i l =
   if i = n then
     l
   else
-      let val c = choose (range 0 n) in
-          if okay 1 c l then enum_nqueens n (i+1) (c :: l) else fail ()
-      end
+    let val c = choose board_range in
+      if not (okay 1 c l) then fail ()
+      else enum_nqueens (i+1) (c :: l)
+    end
 
 open Timer
 open Time
 
 val timer = startCPUTimer ()
-val n = valOf (Int.fromString (hd (CommandLine.arguments ())));
-val res = List.length (withNondeterminism (fn () => enum_nqueens n 0 []))
+val res = List.length (withNondeterminism (fn () => enum_nqueens 0 []))
 val times = let val {usr : time, sys : time } = checkCPUTimer timer in
                 (toMilliseconds sys,
                  toMilliseconds usr)
             end 
 
-
-val _ = (print (LargeInt.toString (#2 times)); OS.Process.exit(OS.Process.success))
+val _ = (
+  print (Int.toString res); print "\n";
+  print (LargeInt.toString (#2 times)); print "\n";
+  OS.Process.exit(OS.Process.success)
+)

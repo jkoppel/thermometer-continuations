@@ -1,47 +1,47 @@
-module type UNIVERSAL = sig
-  type u
-  val to_u : 'a -> u
-  val from_u : u -> 'a
-end
+open List;;
 
-module Universal : UNIVERSAL = struct
-  type u = Obj.t
-  let to_u = Obj.repr
-  let from_u = Obj.obj
-end
-
-let (br_idx : Universal.u list list ref) = ref [];;
-let pos = ref 0;;
+let past = ref []
+let future = ref []
 
 exception Empty;;
 
+let push r x = (r := x :: !r)
+let pop r = match !r with
+  | [] -> None
+  | x::xs -> r := xs; Some x
+
 let rec decr = function
-  | [] :: _ -> assert false
-  | ([_]::ns) -> decr ns
-  | ((_::xs)::ns) -> xs::ns
+  | (0::ns) -> decr ns
+  | (n::ns) -> (n-1)::ns
   | []      -> []
 
 let withNondeterminism f =
   let rec loop acc f =
     let v = try [f()] with Empty -> [] in
     let acc = v @ acc in
-    br_idx := decr !br_idx;
-    pos := List.length !br_idx;
-    match !br_idx with
-    | [] -> List.rev acc
-    |  _  -> loop acc f
-  in loop [] f
+    assert (!future = []);
+    let next = List.rev (decr !past) in
+    future := next;
+    past := [];
+    if next = []
+    then List.rev acc
+    else loop acc f
+  in
+  past := [];
+  future := [];
+  loop [] f
 
 let choose = function
   | [] -> raise Empty
   | xs ->
-    if !pos > 0 then begin
-      pos := !pos - 1;
-      Universal.from_u (List.hd (List.nth !br_idx !pos))
-    end else begin
-      br_idx := List.map Universal.to_u xs :: !br_idx;
-      List.hd xs
-    end
+    match pop future with
+    | Some idx ->
+      push past idx;
+      nth xs ((length xs - 1) - idx)
+    | None ->
+      let idx = (length xs - 1) in
+      push past idx;
+      hd xs
 
 let fail () = choose []
 
@@ -62,6 +62,8 @@ let rec enum_nqueens i l =
     l
   else begin
     let c = choose range in
+    (* (* this implementation is not nesting-safe: *)
+    List.iter ignore (withNondeterminism (fun () -> choose [(); (); ()])); *)
     if not (okay 1 c l) then fail();
     enum_nqueens (i + 1) (c :: l)
   end

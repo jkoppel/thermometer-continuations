@@ -1,0 +1,120 @@
+begin-benchmark	IndirOCaml
+script	"./ocaml/indirect.native"
+header	Indirect (OCaml)
+point	8	1.0
+point	9	4.0
+point	10	8.0
+point	11	41.0
+point	12	241.0
+end-benchmark
+
+begin-benchmark	IndirSML
+script	"indirect.sml"
+header	Indirect (SML/NJ)
+point	8	1
+point	9	3
+point	10	17
+point	11	101
+point	12	411
+end-benchmark
+
+begin-benchmark	ReplayOCaml
+script	"./ocaml/replay_zipper_array.native"
+header	Replay (OCaml)
+point	8	5.0
+point	9	17.0
+point	10	85.0
+point	11	469.0
+point	12	2986.0
+end-benchmark
+
+begin-benchmark	ReplaySML
+script	"replay_zipper_vector.sml"
+header	Replay (SML/NJ)
+point	8	10
+point	9	90
+point	10	310
+point	11	1598
+point	12	601454
+end-benchmark
+
+begin-benchmark	ThermOCaml
+script	"./ocaml/thermometers_generic.native"
+header	Therm. (OCaml)
+point	8	7.0
+point	9	28.0
+point	10	124.0
+point	11	685.0
+point	12	4331.0
+end-benchmark
+
+begin-benchmark	ThermSML
+script	"thermometers.sml"
+header	Therm. (SML/NJ)
+point	8	8
+point	9	36
+point	10	200
+point	11	1289
+point	12	7342
+end-benchmark
+
+begin-benchmark	OptThermOCaml
+script	"./ocaml/thermometers_optimized.native"
+header	Therm. Opt. (OCaml)
+point	8	3.0
+point	9	19.0
+point	10	79.0
+point	11	455.0
+point	12	2884.0
+end-benchmark
+
+begin-benchmark	OptThermSML
+script	"thermometers_optimized.sml"
+header	Therm. Opt. (SML/NJ)
+point	8	5
+point	9	28
+point	10	154
+point	11	875
+point	12	5734
+end-benchmark
+
+begin-benchmark	FilOCaml
+script	"./ocaml/filinski_delimcc.byte"
+header	Filinski (Delimcc, OCaml)
+point	8	14.0
+point	9	62.0
+point	10	286.0
+point	11	1463.0
+point	12	9813.0
+end-benchmark
+
+begin-benchmark	FilSML
+script	"filinski_callcc.sml"
+header	Filinski (Call/cc, SML/NJ)
+point	8	3
+point	9	10
+point	10	49
+point	11	297
+point	12	1553
+end-benchmark
+
+begin-benchmark	EffOCaml
+script	"./ocaml/effect.native"
+header	Eff. Handlers (Multicore OCaml)
+point	8	7.0
+point	9	24.0
+point	10	88.0
+point	11	441.0
+point	12	2779.0
+end-benchmark
+
+begin-benchmark	Prolog
+script	"sh prolog.sh"
+header	Prolog search (SWI-Prolog)
+point	8	136.0
+point	9	201.0
+point	10	683.0
+point	11	3232.0
+point	12	18987.0
+end-benchmark
+
