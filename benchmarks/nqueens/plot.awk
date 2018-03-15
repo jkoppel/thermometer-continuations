@@ -8,26 +8,35 @@ BEGIN { FS="\t" }
 
   KEEP=1
 
-  if (NAME ~ /SML/) {
-      MARK="square"; 
-  } else if (NAME ~ /OCaml/) {
-      MARK="triangle";
-  } else {
-      MARK="o";
-  }
+  # # We used per-language marking
+  # # in the hope of showing all languages together,
+  # # but the resulting plot is way too crowded.
+  # if (NAME ~ /SML/) {
+  #     MARK="square";
+  # } else if (NAME ~ /OCaml/) {
+  #     MARK="triangle";
+  # } else {
+  #     MARK="o";
+  # }
 
   if (NAME ~ /Indir/) {
       COLOR="black";
+      MARK="-";
   } else if (NAME ~ /Replay/) {
       COLOR="orange";
+      MARK="triangle";
   } else if (NAME ~ /OptTherm/) {
       COLOR="purple";
+      MARK="oplus";
   } else if (NAME ~ /Therm/) {
       COLOR="red";
+      MARK="otimes";
   } else if (NAME ~ /Fil/) {
       COLOR="blue";
+      MARK="star";
   } else {
       COLOR="brown";
+      MARK="asterisk";
   }
 
   print "\\addplot[color="COLOR",mark="MARK"]"
