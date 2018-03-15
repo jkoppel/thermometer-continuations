@@ -6,16 +6,14 @@ solve(N, L) :- queens(N, 0, [], L).
 queens(N, N, L, L).
 queens(N, I, L, Res) :-
   I < N,
-  choose_in_range(0, N, C),
-  okay(1, C, L),
+  choose_okay_in_range(0, N, C, L),
   I1 is I+1,
   queens(N, I1, [C|L], Res).
 
-/* choose_in_range(I, N, C) takes input I and N, and holds for each
-   C such that (I <= C < N); it corresponds to a combination of
-   direct-style 'choose' and 'range' in the ML version*/
-choose_in_range(I, N, I) :- I < N.
-choose_in_range(I, N, C) :- I < N, I1 is I+1, choose_in_range(I1, N, C).
+/* choose_okay_in_range(I, N, C) takes input I and N, and holds for each
+   C such that (I <= C < N) and okay(1, C, L) */
+choose_okay_in_range(I, N, I, L) :- I < N, okay(1, I, L).
+choose_okay_in_range(I, N, C, L) :- I < N, I1 is I+1, choose_okay_in_range(I1, N, C, L).
 
 /* okay(I, C, L) holds when (okay I C L) is true in the ML version */
 okay(_, _, []).
