@@ -10,12 +10,17 @@ fun decr (0::ns) = decr ns
   | decr []      = []
 
 fun withNondeterminism f =
-  let val v = [f()] handle Empty => [] in
-      br_idx := decr (!br_idx);
-      pos := length (!br_idx);
-      case !br_idx of
-          [] => v
-       |  _  => v @ withNondeterminism f
+  let fun loop acc f =
+    let val v = [f()] handle Empty => []
+        val acc = v @ acc
+    in
+        br_idx := decr (!br_idx);
+        pos := length (!br_idx);
+        if !br_idx = [] then acc
+        else loop acc f
+    end
+  in
+    loop [] f
   end
 
 fun choose [] = raise Empty
@@ -46,9 +51,8 @@ fun enum_nqueens i l =
   if i = n then
     l
   else
-    let val c = choose board_range in
-      if not (okay 1 c l) then fail ()
-      else enum_nqueens (i+1) (c :: l)
+    let val c = choose (List.filter (fn c => okay 1 c l) board_range) in
+      enum_nqueens (i+1) (c :: l)
     end
 
 open Timer

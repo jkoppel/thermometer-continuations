@@ -1,16 +1,28 @@
 open SMLofNJ.Cont;
 
-signature UNIVERSAL = sig
-    type u;
-    val to_u : 'a -> u;
-    val from_u : u -> 'a;
-end;
+signature UNIVERSAL_TYPE =
+   sig
+      type u
 
-structure Universal : UNIVERSAL = struct
-  datatype u = U;
-  val to_u = Unsafe.cast;
-  val from_u = Unsafe.cast;
-end;
+      val embed: unit -> ('a -> u) * (u -> 'a)
+   end
+
+structure Universal :> UNIVERSAL_TYPE = struct
+  type u = unit -> unit
+
+  exception UniversalFailure
+  fun get NONE = raise UniversalFailure
+    | get (SOME v) = v
+
+  fun 'a embed () =
+     let
+        val r: 'a option ref = ref NONE
+        fun inject (a: 'a): u = fn () => r := SOME a
+        fun project (f: u): 'a = (r := NONE; f (); get (!r))
+     in
+        (inject, project)
+     end
+end
 
 signature ESCAPE =
   sig
@@ -66,12 +78,13 @@ end;
 functor Represent (M : MONAD) : RMONAD = struct
   structure C = Control(type ans = Universal.u M.m)
   structure M = M
-                    
-  fun reflect m = C.shift (fn k => M.bind m k)
-  fun reify t = M.bind (C.reset (fn () => M.return (Universal.to_u (t ()))))
-                       (M.return o Universal.from_u)
-end;
 
+  fun reflect m = C.shift (fn k => M.bind m k)
+  fun reify t =
+    let val (to_u, from_u) = Universal.embed () in
+      M.bind (C.reset (fn () => M.return (to_u (t ())))) (M.return o from_u)
+    end
+end;
 
 
 structure ListMonad : MONAD = struct
@@ -101,7 +114,7 @@ val board_range = range 0 n
 
 fun okay i c []      = true
   | okay i c (x::xs) = c <> x andalso (c-x) <> i andalso (c-x) <> (~i) andalso okay (i+1) c xs
-                   
+
 fun enum_nqueens i l =
   if i = n then
     l
@@ -118,7 +131,7 @@ val res = List.length (withNondeterminism (fn () => enum_nqueens 0 []))
 val times = let val {usr : time, sys : time } = checkCPUTimer timer in
                 (toMilliseconds sys,
                  toMilliseconds usr)
-            end 
+            end
 
 val _ = (
   print (Int.toString res); print "\n";

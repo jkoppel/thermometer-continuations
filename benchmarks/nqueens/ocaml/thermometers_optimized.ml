@@ -1,10 +1,10 @@
-type 'b fcont = {run : 'c. ('b -> 'c) -> 'c}
+type ('b, 'c) cont = ('b -> 'c) -> 'c
 
 module type MONAD = sig
     type 'a m
     val return : 'a -> 'a m
 
-    val bind : 'a m -> ('a -> ('b m) fcont) -> ('b m -> 'c) -> 'c
+    val bind : 'a m -> ('a -> ('b m, 'c) cont) -> ('a -> ('b m, 'c) cont) -> ('b m, 'c) cont
 end
 
 
@@ -32,6 +32,14 @@ module type RMONAD = sig
   val reify : (unit -> ans) -> ans m
 end
 
+(* push : 'a list ref -> 'a -> () *)
+let push st x = (st := x :: !st)
+
+(* pop : 'a list ref x-> 'a option*)
+let pop st = match !st with
+| [] -> None
+| (x::xs) -> (st := xs; Some x)
+
 module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module M = A.M and type ans = A.ans) = struct
   type ans = A.ans
   module M = A.M
@@ -40,28 +48,31 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
   open M
 
   type stack = Universal.u list
+  type rev_stack = stack
 
   exception Throw of stack
   exception Done of Universal.u
 
-  let pos = ref 0
-  let len = ref 0
+  let past : rev_stack ref = ref []
+  let future : stack ref = ref []
 
-  let (stack : stack ref) = ref []
   let (cont : (Universal.u -> Universal.u) ref) = ref (fun x -> assert false)
 
   let reflect m =
-    if !pos < !len then
-      (pos := !pos + 1;
-       Universal.from_u (List.nth (!stack) (!len - !pos)))
-    else
-      let st = !stack in
+    match pop future with
+    | Some u ->
+      push past u;
+      Universal.from_u u
+    | None ->
+      let st = !past in
       bind m
-        (fun x ->
-           let run k =
+        (fun x k ->
+           cont := f_to_u k;
+           push past (Universal.to_u x);
+           x)
+        (fun x k ->
              cont := f_to_u k;
-             raise (Throw ((Universal.to_u x) :: st))
-           in {run})
+             raise (Throw ((Universal.to_u x) :: st)))
         (f_from_u (!cont))
 
   let rec reify_helper f =
@@ -69,10 +80,9 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
       let v = f () in
       f_from_u !cont (return v)
     with
-    | (Throw st) ->
-        pos := 0;
-        len := List.length st;
-        stack := st;
+    | (Throw new_past) ->
+        past := [];
+        future := List.rev new_past;
         reify_helper f
 
     | (Done x) -> Universal.from_u x
@@ -80,7 +90,8 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
 
   let reify f =
     cont := (fun x -> raise (Done x));
-    stack := [];
+    past := [];
+    future := [];
     reify_helper f
 end
 
@@ -90,8 +101,18 @@ module ListMonad : (MONAD with type 'a m = 'a list) = struct
   let return x = [x]
 
   let rec bind l f k = match l with
-    []      -> k []
-  | (x::xs) -> (f x).run (fun a -> bind xs f (fun b -> k (a @ b)))
+    | [] -> k []
+    | x::xs ->
+      f x @@ fun a ->
+      bind xs f @@ fun b ->
+      k (a @ b)
+
+  let bind l first f k = match l with
+    | [] -> k []
+    | x::xs ->
+      first x @@ fun a ->
+      bind xs f @@ fun b ->
+      k (a @ b)
 end
 
 module N = Represent(struct
@@ -102,8 +123,6 @@ end)
 let choose xs = N.reflect xs
 let fail () = N.reflect []
 let withNondeterminism f = N.reify f
-
-let fail () = choose []
 
 let n = int_of_string Sys.argv.(1)
 
@@ -121,8 +140,7 @@ let rec enum_nqueens i l =
   if i = n then
     l
   else begin
-    let c = choose range in
-    if not (okay 1 c l) then fail();
+    let c = choose (List.filter (fun c -> okay 1 c l) range) in
     enum_nqueens (i + 1) (c :: l)
   end
 

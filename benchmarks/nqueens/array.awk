@@ -2,9 +2,11 @@ BEGIN { FS="\t" }
 /begin-benchmark/ {
   NAME=$2
 
-  # set ONLYSML and/or NOSML with (awk -v NOSML=1)
-  if (ONLYSML && $2 !~ /SML/) { KEEP=0; next }
-  if (NOSML && $2 ~ /SML/) { KEEP=0; next }
+  # set OCAML, SML, MLTON or OTHERS with (awk -v SML=1)
+  if (OCAML && $2 !~ /OCaml/) { KEEP=0; next }
+  else if (SML && $2 !~ /SML/) { KEEP=0; next }
+  else if (MLTON && $2 !~ /MLton/) { KEEP=0; next }
+  else if (OTHERS && ($2 ~ /OCaml/ || $2 ~ /SML/ || $2 ~ /MLton/)) { KEEP=0; next }
 
   KEEP=1
 }

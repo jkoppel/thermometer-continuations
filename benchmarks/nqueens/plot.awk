@@ -2,32 +2,32 @@ BEGIN { FS="\t" }
 /begin-benchmark/ {
   NAME=$2
 
-  # set ONLYSML and/or NOSML with (awk -v NOSML=1)
-  if (ONLYSML && $2 !~ /SML/) { KEEP=0; next }
-  if (NOSML && $2 ~ /SML/) { KEEP=0; next }
+  # set OCAML, SML, MLTON or OTHERS with (awk -v SML=1)
+  if (OCAML && $2 !~ /OCaml/) { KEEP=0; next }
+  else if (SML && $2 !~ /SML/) { KEEP=0; next }
+  else if (MLTON && $2 !~ /MLton/) { KEEP=0; next }
+  else if (OTHERS && ($2 ~ /OCaml/ || $2 ~ /SML/ || $2 ~ /MLton/)) { KEEP=0; next }
 
   KEEP=1
 
-  if (NAME ~ /SML/) {
-      MARK="square"; 
-  } else if (NAME ~ /OCaml/) {
-      MARK="triangle";
-  } else {
-      MARK="o";
-  }
-
   if (NAME ~ /Indir/) {
       COLOR="black";
+      MARK="-";
   } else if (NAME ~ /Replay/) {
       COLOR="orange";
+      MARK="triangle";
   } else if (NAME ~ /OptTherm/) {
       COLOR="purple";
+      MARK="oplus";
   } else if (NAME ~ /Therm/) {
       COLOR="red";
+      MARK="otimes";
   } else if (NAME ~ /Fil/) {
       COLOR="blue";
+      MARK="star";
   } else {
       COLOR="brown";
+      MARK="asterisk";
   }
 
   print "\\addplot[color="COLOR",mark="MARK"]"
@@ -55,9 +55,9 @@ BEGIN { FS="\t" }
     SEC=SEC-MIN*60
     TIME=MIN"m"SEC"s"
   }
-  if (ONLYSML || NOSML) {
-    print "\\node[above] at (axis cs: "N", "Y") {"TIME"};"
-  }
+  # if (ONLYSML || NOSML) {
+  #   print "\\node[above] at (axis cs: "N", "Y") {"TIME"};"
+  # }
   print "\\addlegendentry{"LABEL"}"
   print ""
 }

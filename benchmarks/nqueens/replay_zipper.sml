@@ -17,13 +17,20 @@ fun decr (0::ns) = decr ns
 exception Empty;
 
 fun withNondeterminism f =
-  let val v = [f()] handle Empty => []
-      val next = rev (decr (!past))
+  let fun loop acc f =
+    let val v = [f()] handle Empty => []
+        val acc = v @ acc
+        val next = rev (decr (!past))
+    in
+      future := next;
+      past := [];
+      if next = [] then v
+      else loop acc f
+    end
   in
-    future := next;
     past := [];
-    if next = [] then v
-    else v @ withNondeterminism f
+    future := [];
+    loop [] f
   end
 
 fun choose [] = raise Empty
@@ -56,9 +63,8 @@ fun enum_nqueens i l =
   if i = n then
     l
   else
-    let val c = choose board_range in
-      if not (okay 1 c l) then fail ()
-      else enum_nqueens (i+1) (c :: l)
+    let val c = choose (List.filter (fn c => okay 1 c l) board_range) in
+      enum_nqueens (i+1) (c :: l)
     end
 
 open Timer

@@ -1,6 +1,6 @@
 TARGETS=indirect.native \
-  replay.native replay_dynarray.native replay_optimized.native \
-  replay_zipper.native replay_zipper_array.native \
+  replay.native replay_optimized.native \
+  replay_zipper.native replay_zipper_nested.native \
   thermometers_generic.native thermometers_optimized.native
 
 all:

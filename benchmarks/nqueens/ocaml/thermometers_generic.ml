@@ -69,6 +69,41 @@ module Control (A : Answer) : CONTROL with type ans = A.ans = struct
       raise (Done (f k))
 end
 
+module Test = struct
+  module C = Control(struct type ans = int end)
+  open C
+
+  let () = assert (1 + reset (fun () -> 2) = 3)
+  let () = assert (1 + reset (fun () -> (2 + shift (fun k -> 3))) = 4)
+  let () = assert (1 + reset (fun () -> (2 + shift (fun k -> k 3))) = 6)
+  let () = assert (1 + reset (fun () -> (2 + shift (fun k -> k (k 3)))) = 8)
+  let () = assert (1 + reset (fun () -> (2 + shift (fun k -> k (k 3)))) = 8)
+  let () =
+    assert
+      (1 + reset (fun () ->
+           (2 + reset (fun () ->
+                3 + shift (fun k -> k (k 3)))))
+       = 1 + (2 + (3 + (3 + 3))))
+  let () =
+    assert
+      (1 + reset (fun () ->
+           4 + shift (fun k1 -> 2 + reset (fun () ->
+               3 * shift (fun k2 -> k1 (k2 3)))))
+       = 1 + 2 + (4 + (3 * 3)))
+  let () =
+    assert
+      (1 + reset (fun () ->
+           4 + shift (fun k1 -> 2 + reset (fun () ->
+               3 * shift (fun k2 -> k2 (k1 3)))))
+       = 1 + (2 + 3 * (4 + 3)))
+  let () =
+    assert
+      (1 + reset (fun () ->
+           2 + shift (fun k1 ->
+               3 * shift (fun k2 -> k2 (k1 10))))
+       = 1 + 3 * (2 + 10))
+end
+
 module type MONAD = sig
     type 'a m
     val return : 'a -> 'a m
@@ -105,8 +140,6 @@ let choose xs = N.reflect xs
 let fail () = N.reflect []
 let withNondeterminism f = N.reify f
 
-let fail () = choose []
-
 let n = int_of_string Sys.argv.(1)
 
 let range =
@@ -123,8 +156,7 @@ let rec enum_nqueens i l =
   if i = n then
     l
   else begin
-    let c = choose range in
-    if not (okay 1 c l) then fail();
+    let c = choose (List.filter (fun c -> okay 1 c l) range) in
     enum_nqueens (i + 1) (c :: l)
   end
 
