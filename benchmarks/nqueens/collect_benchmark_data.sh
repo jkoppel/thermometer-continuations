@@ -8,11 +8,9 @@ run run_benchmark_time.rb "./ocaml/indirect.native"               12 "Indirect (
 
 run run_benchmark.rb      indirect.sml                            12 "Indirect (SML/NJ)"                IndirSML
 
-run run_benchmark_time.rb "./ocaml/replay_zipper_array.native"    12 "Replay (OCaml)"                   ReplayOCaml
+run run_benchmark_time.rb "./ocaml/replay_zipper.native"          12 "Replay (OCaml)"                   ReplayOCaml
 
-run run_benchmark.rb      replay_zipper_vector.sml                11 "Replay (SML/NJ)"                  ReplaySML
-# note: the Vector version timeouts for N=12, so I manually replaced this result with replay_zipper.sml's in the output
-# (the result is 307090ms on my machine, about 5m30s)
+run run_benchmark.rb      replay_zipper.sml                       12 "Replay (SML/NJ)"                  ReplaySML
 
 run run_benchmark_time.rb "./ocaml/thermometers_generic.native"   12 "Therm. (OCaml)"                   ThermOCaml
 
