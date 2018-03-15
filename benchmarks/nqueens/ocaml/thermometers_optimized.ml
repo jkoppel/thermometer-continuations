@@ -1,10 +1,10 @@
-type 'b fcont = {run : 'c. ('b -> 'c) -> 'c}
+type 'b cont = {run : 'c. ('b -> 'c) -> 'c}
 
 module type MONAD = sig
     type 'a m
     val return : 'a -> 'a m
 
-    val bind : 'a m -> ('a -> ('b m) fcont) -> ('b m -> 'c) -> 'c
+    val bind : 'a m -> ('a -> ('b m -> 'c) -> 'c) -> ('a -> ('b m) cont) -> ('b m -> 'c) -> 'c
 end
 
 
@@ -66,11 +66,13 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
     | None ->
       let st = !past in
       bind m
-        (fun x ->
-           let run k =
+        (fun x k ->
+           cont := f_to_u k;
+           push past (Universal.to_u x);
+           x)
+        (fun x -> { run = fun k ->
              cont := f_to_u k;
-             raise (Throw ((Universal.to_u x) :: st))
-           in {run})
+             raise (Throw ((Universal.to_u x) :: st)) })
         (f_from_u (!cont))
 
   let rec reify_helper f =
@@ -99,8 +101,18 @@ module ListMonad : (MONAD with type 'a m = 'a list) = struct
   let return x = [x]
 
   let rec bind l f k = match l with
-    []      -> k []
-  | (x::xs) -> (f x).run (fun a -> bind xs f (fun b -> k (a @ b)))
+    | [] -> k []
+    | x::xs ->
+      (f x).run @@ fun a ->
+      bind xs f @@ fun b ->
+      k (a @ b)
+
+  let bind l first f k = match l with
+    | [] -> k []
+    | x::xs ->
+      first x @@ fun a ->
+      bind xs f @@ fun b ->
+      k (a @ b)
 end
 
 module N = Represent(struct
