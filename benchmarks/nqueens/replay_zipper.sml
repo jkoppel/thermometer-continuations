@@ -56,9 +56,8 @@ fun enum_nqueens i l =
   if i = n then
     l
   else
-    let val c = choose board_range in
-      if not (okay 1 c l) then fail ()
-      else enum_nqueens (i+1) (c :: l)
+    let val c = choose (List.filter (fn c => okay 1 c l) board_range) in
+      enum_nqueens (i+1) (c :: l)
     end
 
 open Timer
