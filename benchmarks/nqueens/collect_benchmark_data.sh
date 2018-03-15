@@ -1,29 +1,30 @@
 run() {
-    printf "begin-benchmark\t$5\n"
-    ruby $1 "$2" "$3" "$4"
+    printf "begin-benchmark\t$6\n"
+    ruby $1 "$2" $3 $4 "$5"
     printf "end-benchmark\n\n"
 }
 
-run run_benchmark_time.rb "./ocaml/indirect.native"               12 "Indirect (OCaml)"                 IndirOCaml
+run run_benchmark_time.rb "./ocaml/indirect.native"               10 13 "Indirect (OCaml)"                 IndirOCaml
 
-run run_benchmark.rb      indirect.sml                            12 "Indirect (SML/NJ)"                IndirSML
+run run_benchmark.rb      indirect.sml                            10 13 "Indirect (SML/NJ)"                IndirSML
 
-run run_benchmark_time.rb "./ocaml/replay_zipper.native"          12 "Replay (OCaml)"                   ReplayOCaml
+run run_benchmark_time.rb "./ocaml/replay_zipper.native"          10 13 "Replay (OCaml)"                   ReplayOCaml
 
-run run_benchmark.rb      replay_zipper.sml                       12 "Replay (SML/NJ)"                  ReplaySML
+run run_benchmark.rb      replay_zipper.sml                       10 13 "Replay (SML/NJ)"                  ReplaySML
 
-run run_benchmark_time.rb "./ocaml/thermometers_generic.native"   12 "Therm. (OCaml)"                   ThermOCaml
+run run_benchmark_time.rb "./ocaml/thermometers_generic.native"   10 13 "Therm. (OCaml)"                   ThermOCaml
 
-run run_benchmark.rb      thermometers.sml                        12 "Therm. (SML/NJ)"                  ThermSML
+run run_benchmark.rb      thermometers.sml                        10 13 "Therm. (SML/NJ)"                  ThermSML
 
-run run_benchmark_time.rb "./ocaml/thermometers_optimized.native" 12 "Therm. Opt. (OCaml)"              OptThermOCaml
+run run_benchmark_time.rb "./ocaml/thermometers_optimized.native" 10 13 "Therm. Opt. (OCaml)"              OptThermOCaml
 
-run run_benchmark.rb      thermometers_optimized.sml              12 "Therm. Opt. (SML/NJ)"             OptThermSML
+run run_benchmark.rb      thermometers_optimized.sml              10 13 "Therm. Opt. (SML/NJ)"             OptThermSML
 
-run run_benchmark_time.rb "./ocaml/filinski_delimcc.byte"         12 "Filinski (Delimcc, OCaml)"        FilOCaml
+run run_benchmark_time.rb "./ocaml/filinski_delimcc.native"       10 13 "Filinski (Delimcc, OCaml)"        FilOCaml
+# note: with the faster-nqueens implementation, Native delimcc beats Bytecode delimcc again
 
-run run_benchmark.rb      filinski_callcc.sml                     12 "Filinski (Call/cc, SML/NJ)"       FilSML
+run run_benchmark.rb      filinski_callcc.sml                     10 13 "Filinski (Call/cc, SML/NJ)"       FilSML
 
-run run_benchmark_time.rb "./ocaml/effect.native"                 12 "Eff. Handlers (Multicore OCaml)"  EffOCaml
+run run_benchmark_time.rb "./ocaml/effect.native"                 10 13 "Eff. Handlers (Multicore OCaml)"  EffOCaml
 
-run run_benchmark_time.rb "sh prolog.sh"                          12 "Prolog search (SWI-Prolog)"       Prolog
+#run run_benchmark_time.rb "sh prolog.sh"                          8 12 "Prolog search (SWI-Prolog)"       Prolog
