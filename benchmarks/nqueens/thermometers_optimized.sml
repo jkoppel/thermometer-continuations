@@ -23,9 +23,8 @@ signature MONAD = sig
     type 'a m
     val return : 'a -> 'a m
     (* First function to bind may be tail-called; second one may not *)
-    val bind : 'a m -> ('a -> ('b m) fcont) -> ('a -> ('b m) fcont) -> ('b m -> 'c) -> 'c 
+    val bind : 'a m -> ('a -> ('b m -> 'c) -> 'c) -> ('a -> ('b m) fcont) -> ('b m -> 'c) -> 'c 
 end
-    
 (* bind : 'a m -> ('a -> (('b m -> 'c) -> 'c)) -> ('a -> (('b m -> 'c) -> 'c)) -> ('b m -> 'c) -> 'c *)
                       
 signature RMONAD = sig
@@ -61,11 +60,13 @@ functor Represent (S : sig structure M : MONAD; type ans; end) : RMONAD = struct
     else
       let val st = !stack in
           bind m
-               (fn x => packf (fn k => (cont := f_to_u k;
-                                        stack := (Universal.to_u x) :: st;
-                                        x)))
-               (fn x => packf (fn k => (cont := f_to_u k;
-                                        raise (Invoke ((Universal.to_u x) :: st)))))
+               (fn x => fn k =>
+                  (cont := f_to_u k;
+                   stack := (Universal.to_u x) :: st;
+                   x))
+               (fn x => packf (fn k =>
+                   (cont := f_to_u k;
+                    raise (Invoke ((Universal.to_u x) :: st)))))
                (f_from_u (!cont))
       end
 
@@ -98,9 +99,17 @@ structure ListMonad : MONAD = struct
 
   fun return x = [x]
 
-  fun bind []      f f' k = k []
-    | bind (x::xs) f f' k = runf (f x) (fn a => bind xs f' f'
-                                                     (fn b => k (a @ b)))
+  fun bind []      f_first f_rest k = k []
+    | bind (x::xs) f_first f_rest k =
+      f_first x (fn a =>
+      bind_rest xs f_rest (fn b =>
+      k (a @ b)))
+
+  and bind_rest []      f k = k []
+    | bind_rest (x::xs) f k =
+      runf (f x) (fn a =>
+      bind_rest xs f (fn b =>
+      k (a @ b)))
 end
     
 structure N = Represent(struct structure M = ListMonad; type ans = int list; end);
