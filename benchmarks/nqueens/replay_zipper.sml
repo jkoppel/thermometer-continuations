@@ -17,13 +17,20 @@ fun decr (0::ns) = decr ns
 exception Empty;
 
 fun withNondeterminism f =
-  let val v = [f()] handle Empty => []
-      val next = rev (decr (!past))
+  let fun loop acc f =
+    let val v = [f()] handle Empty => []
+        val acc = v @ acc
+        val next = rev (decr (!past))
+    in
+      future := next;
+      past := [];
+      if next = [] then v
+      else loop acc f
+    end
   in
-    future := next;
     past := [];
-    if next = [] then v
-    else v @ withNondeterminism f
+    future := [];
+    loop [] f
   end
 
 fun choose [] = raise Empty

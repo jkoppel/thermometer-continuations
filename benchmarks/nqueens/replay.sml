@@ -10,12 +10,17 @@ fun decr (0::ns) = decr ns
   | decr []      = []
 
 fun withNondeterminism f =
-  let val v = [f()] handle Empty => [] in
-      br_idx := decr (!br_idx);
-      pos := length (!br_idx);
-      case !br_idx of
-          [] => v
-       |  _  => v @ withNondeterminism f
+  let fun loop acc f =
+    let val v = [f()] handle Empty => []
+        val acc = v @ acc
+    in
+        br_idx := decr (!br_idx);
+        pos := length (!br_idx);
+        if !br_idx = [] then acc
+        else loop acc f
+    end
+  in
+    loop [] f
   end
 
 fun choose [] = raise Empty
