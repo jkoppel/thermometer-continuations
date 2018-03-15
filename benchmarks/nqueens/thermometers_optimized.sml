@@ -14,18 +14,14 @@ structure Universal : UNIVERSAL = struct
   val from_u = Unsafe.cast
 end
 
-type 'b fcont = Universal.u  (* forall 'c. ('b -> 'c) -> 'c *)
-fun packf (f : ('b -> 'c) -> 'c) = Universal.to_u f
-fun runf (f : 'b fcont) : ('b -> 'c) -> 'c = Universal.from_u f
-
+type ('b, 'c) cont = ('b -> 'c) -> 'c
                                                    
 signature MONAD = sig
     type 'a m
     val return : 'a -> 'a m
     (* First function to bind may be tail-called; second one may not *)
-    val bind : 'a m -> ('a -> ('b m -> 'c) -> 'c) -> ('a -> ('b m) fcont) -> ('b m -> 'c) -> 'c 
+    val bind : 'a m -> ('a -> ('b m, 'c) cont) -> ('a -> ('b m, 'c) cont) -> ('b m, 'c) cont
 end
-(* bind : 'a m -> ('a -> (('b m -> 'c) -> 'c)) -> ('a -> (('b m -> 'c) -> 'c)) -> ('b m -> 'c) -> 'c *)
                       
 signature RMONAD = sig
   structure M : MONAD
@@ -64,9 +60,9 @@ functor Represent (S : sig structure M : MONAD; type ans; end) : RMONAD = struct
                   (cont := f_to_u k;
                    stack := (Universal.to_u x) :: st;
                    x))
-               (fn x => packf (fn k =>
+               (fn x => fn k =>
                    (cont := f_to_u k;
-                    raise (Invoke ((Universal.to_u x) :: st)))))
+                    raise (Invoke ((Universal.to_u x) :: st))))
                (f_from_u (!cont))
       end
 
@@ -107,7 +103,7 @@ structure ListMonad : MONAD = struct
 
   and bind_rest []      f k = k []
     | bind_rest (x::xs) f k =
-      runf (f x) (fn a =>
+      f x (fn a =>
       bind_rest xs f (fn b =>
       k (a @ b)))
 end

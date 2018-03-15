@@ -1,10 +1,10 @@
-type 'b cont = {run : 'c. ('b -> 'c) -> 'c}
+type ('b, 'c) cont = ('b -> 'c) -> 'c
 
 module type MONAD = sig
     type 'a m
     val return : 'a -> 'a m
 
-    val bind : 'a m -> ('a -> ('b m -> 'c) -> 'c) -> ('a -> ('b m) cont) -> ('b m -> 'c) -> 'c
+    val bind : 'a m -> ('a -> ('b m, 'c) cont) -> ('a -> ('b m, 'c) cont) -> ('b m, 'c) cont
 end
 
 
@@ -70,9 +70,9 @@ module Represent (A : sig module M : MONAD;; type ans end) : (RMONAD with module
            cont := f_to_u k;
            push past (Universal.to_u x);
            x)
-        (fun x -> { run = fun k ->
+        (fun x k ->
              cont := f_to_u k;
-             raise (Throw ((Universal.to_u x) :: st)) })
+             raise (Throw ((Universal.to_u x) :: st)))
         (f_from_u (!cont))
 
   let rec reify_helper f =
@@ -103,7 +103,7 @@ module ListMonad : (MONAD with type 'a m = 'a list) = struct
   let rec bind l f k = match l with
     | [] -> k []
     | x::xs ->
-      (f x).run @@ fun a ->
+      f x @@ fun a ->
       bind xs f @@ fun b ->
       k (a @ b)
 
