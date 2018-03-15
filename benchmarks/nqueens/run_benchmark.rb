@@ -23,7 +23,7 @@ LOWERBOUND.upto(UPPERBOUND) do |n|
   TRIALS.times {
     unless best > 60*1000*2 then
       run = `timeout 10m sml #{file} #{n}`.lines[-1].to_i
-      if best = 0 || run < best then best = run end
+      if best == 0 || run < best then best = run end
     end
   }
   best += 1 # stabilize on log-axis

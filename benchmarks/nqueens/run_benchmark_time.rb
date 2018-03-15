@@ -32,7 +32,7 @@ LOWERBOUND.upto(UPPERBOUND) do |n|
       #p s
       m = s.match(/user\s+(\d+)m(\d+.\d+)s/)
       run = (m[1].to_i * 60 + m[2].to_f) * 1000
-      if best = 0 || run < best then best = run end
+      if best == 0 || run < best then best = run end
     end
   end
   best += 1 # stabilize on log-axis
