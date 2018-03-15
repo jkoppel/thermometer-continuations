@@ -26,12 +26,12 @@ point	13	3768.0
 end-benchmark
 
 begin-benchmark	ReplaySML
-script	"replay_zipper.sml"
+script	"replay.sml"
 header	Replay (SML/NJ)
-point	10	31
-point	11	228
-point	12	1173
-point	13	7831
+point	10	29
+point	11	164
+point	12	1051
+point	13	6562
 end-benchmark
 
 begin-benchmark	ThermOCaml
