@@ -10,7 +10,7 @@ run run_benchmark.rb      indirect.sml                            10 13 "Indirec
 
 run run_benchmark_time.rb "./ocaml/replay_zipper.native"          10 13 "Replay (OCaml)"                   ReplayOCaml
 
-run run_benchmark.rb      replay_zipper.sml                       10 13 "Replay (SML/NJ)"                  ReplaySML
+run run_benchmark.rb      replay.sml                              10 13 "Replay (SML/NJ)"                  ReplaySML
 
 run run_benchmark_time.rb "./ocaml/thermometers_generic.native"   10 13 "Therm. (OCaml)"                   ThermOCaml
 
