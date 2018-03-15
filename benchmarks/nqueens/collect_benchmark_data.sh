@@ -27,4 +27,11 @@ run run_benchmark.rb      filinski_callcc.sml                     10 13 "Filinsk
 
 run run_benchmark_time.rb "./ocaml/effect.native"                 10 13 "Eff. Handlers (Multicore OCaml)"  EffOCaml
 
-#run run_benchmark_time.rb "sh prolog.sh"                          8 12 "Prolog search (SWI-Prolog)"       Prolog
+run run_benchmark_time.rb "sh prolog.sh"                          8 12 "Prolog search (SWI-Prolog)"       Prolog
+
+if test "$USE_MLTON" = "true"
+then
+    run run_benchmark_time.rb "./indirect"                        10 13 "Indirect"                         IndirMLton
+    run run_benchmark_time.rb "./replay_zipper"                   10 13 "Replay"                           ReplayMLton
+    run run_benchmark_time.rb "./filinski_callcc_derived_universal" 10 13 "Finlinski (Call/cc)"            FilMLton
+fi

@@ -2,23 +2,13 @@ BEGIN { FS="\t" }
 /begin-benchmark/ {
   NAME=$2
 
-  # set OCAML, SML or OTHERS with (awk -v SML=1)
+  # set OCAML, SML, MLTON or OTHERS with (awk -v SML=1)
   if (OCAML && $2 !~ /OCaml/) { KEEP=0; next }
   else if (SML && $2 !~ /SML/) { KEEP=0; next }
-  else if (OTHERS && ($2 ~ /OCaml/ || $2 ~ /SML/)) { KEEP=0; next }
+  else if (MLTON && $2 !~ /MLton/) { KEEP=0; next }
+  else if (OTHERS && ($2 ~ /OCaml/ || $2 ~ /SML/ || $2 ~ /MLton/)) { KEEP=0; next }
 
   KEEP=1
-
-  # # We used per-language marking
-  # # in the hope of showing all languages together,
-  # # but the resulting plot is way too crowded.
-  # if (NAME ~ /SML/) {
-  #     MARK="square";
-  # } else if (NAME ~ /OCaml/) {
-  #     MARK="triangle";
-  # } else {
-  #     MARK="o";
-  # }
 
   if (NAME ~ /Indir/) {
       COLOR="black";
