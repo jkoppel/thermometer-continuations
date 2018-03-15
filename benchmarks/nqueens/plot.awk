@@ -55,9 +55,9 @@ BEGIN { FS="\t" }
     SEC=SEC-MIN*60
     TIME=MIN"m"SEC"s"
   }
-  if (ONLYSML || NOSML) {
-    print "\\node[above] at (axis cs: "N", "Y") {"TIME"};"
-  }
+  # if (ONLYSML || NOSML) {
+  #   print "\\node[above] at (axis cs: "N", "Y") {"TIME"};"
+  # }
   print "\\addlegendentry{"LABEL"}"
   print ""
 }
