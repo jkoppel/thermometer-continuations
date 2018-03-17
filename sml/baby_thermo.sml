@@ -1,9 +1,8 @@
-type ans = int
-exception Done of ans
+exception Done of int
 exception Impossible
                       
-val state : ans option ref = ref NONE
-val cur_expr : (unit -> ans) ref = ref (fn () => raise Impossible)
+val state : int option ref = ref NONE
+val cur_expr : (unit -> int) ref = ref (fn () => raise Impossible)
 
                 
 fun shift f = case !state of
