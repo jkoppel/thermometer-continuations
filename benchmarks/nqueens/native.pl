@@ -23,4 +23,6 @@ okay(I, C, [X|XS]) :- C =\= X, (C-X) =\= I, (X-C) =\= I, I1 is I+1, okay(I1, C, 
    number of solutions of Q.
    count(N, Count) holds when Count is the number of
    valid placements of N queens. */
-count(N, Count) :- aggregate_all(count, solve(N, L), Count).
+count(N, Count) :-
+    findall(L, solve(N, L), Solutions),
+    length(Solutions, Count).
