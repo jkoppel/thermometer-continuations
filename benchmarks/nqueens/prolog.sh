@@ -1,1 +1,1 @@
-echo "count($1, Count)." | swipl -f native.pl
+echo "count($1, Count)." | swipl -O -f native.pl
