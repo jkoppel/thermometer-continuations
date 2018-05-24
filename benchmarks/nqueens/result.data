@@ -100,9 +100,11 @@ end-benchmark
 begin-benchmark	Prolog
 script	"sh prolog.sh"
 header	Prolog search (SWI-Prolog)
-point	10	611.0
-point	11	2997.0
-point	12	17616.0
+point	8	104.0
+point	9	152.0
+point	10	375.0
+point	11	1647.0
+point	12	9289.0
 end-benchmark
 
 begin-benchmark	IndirMLton
