@@ -32,7 +32,7 @@ run run_benchmark_time.rb "./ocaml/effect.native"                 10 13 "Eff. Ha
 # profiling shows that most of the time is spent in the arithmetic comparison =/= in okay,
 # which may come from having only boxed integers.
 
-run run_benchmark_time.rb "sh gprolog.sh"                         10 13 "Prolog search (GProlog)"          Prolog
+run run_benchmark_time.rb "sh gprolog.sh"                         10 13 "Prolog search (GNU Prolog)"       Prolog
 
 if test "$USE_MLTON" = "true"
 then

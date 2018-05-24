@@ -99,7 +99,7 @@ end-benchmark
 
 begin-benchmark	Prolog
 script	"sh gprolog.sh"
-header	Prolog search (GProlog)
+header	Prolog search (GNU Prolog)
 point	10	165.0
 point	11	614.0
 point	12	3307.0
