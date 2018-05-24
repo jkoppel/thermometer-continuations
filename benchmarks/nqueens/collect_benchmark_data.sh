@@ -27,9 +27,9 @@ run run_benchmark.rb      filinski_callcc.sml                     10 13 "Filinsk
 
 run run_benchmark_time.rb "./ocaml/effect.native"                 10 13 "Eff. Handlers (Multicore OCaml)"  EffOCaml
 
-run run_benchmark_time.rb "sh prolog.sh"                          8 12 "Prolog search (SWI-Prolog)"       SWIProlog
+run run_benchmark_time.rb "sh prolog.sh"                          10 12 "Prolog search (SWI-Prolog)"       SWIProlog
 
-run run_benchmark_time.rb "sh gprolog.sh"                         8 12 "Prolog search (GProlog)"          GProlog
+run run_benchmark_time.rb "sh gprolog.sh"                         10 12 "Prolog search (GProlog)"          GProlog
 
 if test "$USE_MLTON" = "true"
 then
