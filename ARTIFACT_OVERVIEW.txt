@@ -1,0 +1,63 @@
+GETTING STARTED
+
+You have a choice to either build a new Docker image from the Dockerfile, or use our pre-existing one.
+
+To create a new Docker image:
+
+Navigate to directory containing Dockerfile. Run: docker build -t thermometer-continuations .
+
+To run Docker image:
+
+docker run -ti thermometer-continuations
+
+
+The /thermocont/sml and /thermocont/ocaml contain implementations of the examples in the paper. There is some slight difference in variable names between this code and the paper. You can run them with "ocaml <name_of_file>" or "sml <name_of_file>" respectively.
+
+
+********************************************************************************
+
+STEP BY STEP INSTRUCTIONS
+
+To run nqueens benchmarks:
+
+The Docker file comes with the OCaml ones pre-built. The SML and Prolog ones do not need to be precompiled. Navigate to /thermocont/benchmarks/nqueens and run “collect_benchmark_data.sh” . It will run all nqueens benchmarks. 
+
+Note that this folder also contains a Curry implementation, which was cut from the paper in favor of the much-faster Prolog implementation
+
+
+------------------------------------------------
+
+To run INTPARSE-GLOB benchmarks:
+
+Navigate to /thermocont/benchmarks/parse_failable and run “ruby run_benchmark.rb <name of file> <percent input before bad value>”. Values of <percent input before bad value> used in the aper are 0.5, 1
+
+------------------------------------------------
+
+To run INTPARSE_LOCAL benchmarks:
+
+Navigate to /thermocont/benchmarks/parse_failable and run “ruby run_benchmark.rb <name of file> <spacing of bad values>”. Values of <spacing of bad values> used in the aper are 100, 10, 2
+
+------------------------------------------------
+
+To run MONADIC-ARITH_PARSE benchmarks:
+
+Navigate to /thermocont/benchmarks/monadic_parsing . Open run_benchmark.rb and modify run_benchmark.rb to modify the VALUES array and num trials. We’ve installed Vim on this container so you can do this. Run “ruby run_benchmark.rb <name of file>” to run that implementation of monadic parsing. It will generate TRIALS different inputs using a fixed random seed. Beware that some of these trials are VERY long-running.
+
+------------------------------------------------
+
+To generate plot for nqueens benchmark
+
+From the /thermocont/benchmarks/nqueens folder:
+
+> sh collect_benchmark_data.sh > result.data
+> sh transform_data.sh
+
+This will populate a latex/ subdirectory with TikZ commands that draw the plot, as well as raw performance numbers in a table.
+
+********************************************************************************
+
+OTHER NOTES
+
+Note that the versions of OCaml and SML in this Docker image are slightly older than the ones used in the paper, because Ubuntu packages for those versions were unavailable.
+
+We have been having trouble getting Multicore OCaml to run on this machine. The Multicore OCaml / effect handler benchmark hence does not currently run. We have decided to go ahead and make our first submission without this benchmark.
