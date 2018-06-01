@@ -22,7 +22,20 @@ RUN apt-get install -y --no-install-recommends aspcud=1:1.9.4-1 opam=1.2.2-6
 # Install a switch for the standard 4.06.1 compiler, and base packages for it
 RUN opam init --comp 4.06.1
 RUN opam switch 4.06.1 && eval $(opam config env) \
-    && opam install -y ocamlbuild.0.12.0 ocamlfind.1.8.0 delimcc.2017.03.02
+    && opam install -y ocamlbuild.0.12.0 ocamlfind.1.8.0
+
+# We install 'delimcc' from sources that are newer than the
+# OPAM-packaged versions, because the latest OPAM packages for delimcc
+# (at the time of writing this artifact) use an older delimcc version
+# doesn't support gcc 7.x (this bug was found and reported to Oleg by
+# ourselves while we were building those benchmarks)
+RUN opam switch 4.06.1 && eval $(opam config env) \
+    && cd /tmp \
+    && wget http://okmij.org/ftp/continuations/caml-shift-20180316.tar.gz \
+    && tar -xzvf caml-shift-20180316.tar.gz \
+    && cd caml-shift/ \
+    && make all opt \
+    && make findlib-install
 
 # Install the experimental 'multicore' compiler in a 4.06.1+multicore switch
 RUN opam remote add multicore https://github.com/ocamllabs/multicore-opam.git \
@@ -49,18 +62,24 @@ RUN cd /thermocont/nqueens \
     && mlton replay_zipper.sml \
     && mlton filinski_callcc_derived_universal.sml
 
-## Build the OCaml benchmarks (minus 'effect')
+## Build the standard OCaml benchmarks
 
 RUN cd /thermocont/nqueens/ocaml \
     && opam switch 4.06.1 && eval $(opam config env) \
     && make clean \
-    && make all \
-    && make delimcc
-
+    && make all
 # Note: "ADD benchmarks /thermocont" may copy over the Docker
 # container some build artefacts coming from the host's repository (if
 # it was used for testing and not in a clean state). The 'make clean'
 # run above makes sure we start from a clean state.
+
+
+## Build the delimcc-using OCaml benchmarks
+
+RUN cd /thermocont/nqueens/ocaml \
+    && opam switch 4.06.1 && eval $(opam config env) \
+    && make delimcc
+
 
 ## Build the effect-handler OCaml benchmarks
 
