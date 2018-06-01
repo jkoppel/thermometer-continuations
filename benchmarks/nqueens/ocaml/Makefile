@@ -28,5 +28,5 @@ effect:
 	ocamlbuild $(EFFECT_TARGETS)
 
 clean:
-	rm $(TARGETS) $(DELIMCC_TARGETS) $(EFFECT_TARGETS)
+	rm $(TARGETS) $(DELIMCC_TARGETS) $(EFFECT_TARGETS) || true
 	ocamlbuild -classic-display -clean
