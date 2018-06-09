@@ -20,7 +20,7 @@ RUN apt-get install -y --no-install-recommends aspcud=1:1.9.4-1 opam=1.2.2-6
 # implementation, and the 'multicore' experimental variant with effect handlers)
 
 # Install a switch for the standard 4.06.1 compiler, and base packages for it
-RUN opam init --comp 4.06.1
+RUN opam init --compiler=4.06.1
 RUN opam switch 4.06.1 && eval $(opam config env) \
     && opam install -y ocamlbuild.0.12.0 ocamlfind.1.8.0
 
