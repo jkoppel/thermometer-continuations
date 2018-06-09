@@ -24,18 +24,9 @@ RUN opam init --compiler=4.06.1
 RUN opam switch 4.06.1 && eval $(opam config env) \
     && opam install -y ocamlbuild.0.12.0 ocamlfind.1.8.0
 
-# We install 'delimcc' from sources that are newer than the
-# OPAM-packaged versions, because the latest OPAM packages for delimcc
-# (at the time of writing this artifact) use an older delimcc version
-# doesn't support gcc 7.x (this bug was found and reported to Oleg by
-# ourselves while we were building those benchmarks)
+# Install delimcc
 RUN opam switch 4.06.1 && eval $(opam config env) \
-    && cd /tmp \
-    && wget http://okmij.org/ftp/continuations/caml-shift-20180316.tar.gz \
-    && tar -xzvf caml-shift-20180316.tar.gz \
-    && cd caml-shift/ \
-    && make all opt \
-    && make findlib-install
+    && opam install -y delimcc.2018.03.16
 
 # Install the experimental 'multicore' compiler in a 4.06.1+multicore switch
 RUN opam remote add multicore https://github.com/ocamllabs/multicore-opam.git \
