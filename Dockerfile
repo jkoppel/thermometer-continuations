@@ -43,19 +43,20 @@ RUN opam switch 4.06.1+multicore && eval $(opam config env) \
 # when rebuilding the Docker image. On the other hand,
 # environment-setting commands above remain cached.
 WORKDIR /thermocont
-ADD benchmarks /thermocont
-
+ADD benchmarks /thermocont/benchmarks
+ADD ocaml /thermocont/ocaml
+ADD sml /thermocont/sml
 
 ## Build the SML benchmarks
 
-RUN cd /thermocont/nqueens \
+RUN cd /thermocont/benchmarks/nqueens \
     && mlton indirect.sml \
     && mlton replay_zipper.sml \
     && mlton filinski_callcc_derived_universal.sml
 
 ## Build the standard OCaml benchmarks
 
-RUN cd /thermocont/nqueens/ocaml \
+RUN cd /thermocont/benchmarks/nqueens/ocaml \
     && opam switch 4.06.1 && eval $(opam config env) \
     && make clean \
     && make all
@@ -67,15 +68,13 @@ RUN cd /thermocont/nqueens/ocaml \
 
 ## Build the delimcc-using OCaml benchmarks
 
-RUN cd /thermocont/nqueens/ocaml \
+RUN cd /thermocont/benchmarks/nqueens/ocaml \
     && opam switch 4.06.1 && eval $(opam config env) \
     && make delimcc
 
 
 ## Build the effect-handler OCaml benchmarks
 
-RUN cd /thermocont/nqueens/ocaml \
+RUN cd /thermocont/benchmarks/nqueens/ocaml \
     && opam switch 4.06.1+multicore && eval $(opam config env) \
     && make effect
-
-CMD ["bash"]
