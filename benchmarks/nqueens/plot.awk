@@ -18,10 +18,10 @@ BEGIN { FS="\t" }
       MARK="triangle";
   } else if (NAME ~ /OptTherm/) {
       COLOR="purple";
-      MARK="oplus";
+      MARK="|";
   } else if (NAME ~ /Therm/) {
       COLOR="red";
-      MARK="otimes";
+      MARK="x";
   } else if (NAME ~ /Fil/) {
       COLOR="blue";
       MARK="star";
