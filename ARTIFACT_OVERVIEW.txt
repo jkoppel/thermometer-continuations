@@ -8,11 +8,78 @@ Navigate to directory containing Dockerfile. Run: docker build -t thermometer-co
 
 To run Docker image:
 
+docker load < thermocont_image.tar.gz
 docker run -ti thermometer-continuations
 
 
 The /thermocont/sml and /thermocont/ocaml contain implementations of the examples in the paper. There is some slight difference in variable names between this code and the paper. You can run them with "ocaml <name_of_file>" or "sml <name_of_file>" respectively.
 
+********************************************************************************
+
+Note on running OCaml:
+
+These benchmarks use 3 distinct versions of OCaml. At startup time, none of them will be on the PATH. Before running OCaml, run the following command:
+
+  eval $(opam config env)
+
+
+********************************************************************************
+
+Full file organization:
+
+- benchmarks/          # Benchmarks from the paper
+
+--- monadic_parsing/   # Benchmarks for MONADIC-ARITH-PARSE
+----- delim.sml        # Row "Therm." from Table 4
+----- filinski.sml     # Row "Filinski" from Table 4
+----- indirect.sml     # Row "Direct" from Table 4 (oops)
+----- run_benchmark.rb # Script to run benchmark. Takes 1 argument (filename). Manually modify the TRIALS variable
+
+--- nqueens/              # Benchmarkns for NQUEENS
+------- Most files in this directory are either build scripts (see the Dockerfile for usage),
+------- or are invoked by collect_benchmark_data.sh (which runs the benchmarks and outputs a data file)
+------- or by transform_data.sh (which outputs the data to LaTeX)
+-------
+------- The SML times in Table 1 correspond to files indirect.sml, replay.sml, thermometers.sml, thermometers_optimized.sml,
+------- and filinski_callcc.sml, respectively.
+-------
+------- The MLTon times in Table 1 correspond to files indirect.sml, replay_zipper.sml, and filinski_callcc_derived_universal.sml
+-------
+------- The Prolog time corresponds to native.pl
+----- ocaml/              # OCaml implementations
+------ Makefile
+-------- The OCaml times in the table correspond to files indirect.ml, replay_zipper.ml,
+-------- thermometers_generic.ml, thermometers_optimized.ml, filinski_delimcc.ml, and effect.ml, respectively. .
+-------- This directory also contains 3 more variants of replay-based nondeterminism: replay.ml, replay_optimized.ml,
+-------- and replay_zipper_nested.ml
+
+--- parse_failable/         # Benchmarks for INTPARSE-GLOB
+----- delim.sml             # Row "Therm" from Table 2
+----- filinski.sml          # Row "Filinski" from Table 2
+----- generic_optimized.sml # Row "Therm. Opt" from Table 2
+----- indirect.sml          # Row "Direct" from Table 2 (oops)
+----- run_benchmark.rb      # Script to run benchmark. Usage: ruby run_benchmark.rb <name of file> <percent input before bad value>
+
+--- parse_recover/         # Benchmarks for INTPARSE-LOCAL
+----- delim.sml             # Row "Therm" from Table 3
+----- filinski.sml          # Row "Filinski" from Table 3
+----- generic_optimized.sml # Row "Therm. Opt" from Table 3
+----- indirect.sml          # Row "Direct" from Table 3 (oops)
+----- run_benchmark.rb      # Script to run benchmark. Usage: ruby run_benchmark.rb <name of file> <spacing of bad values>
+
+- ocaml/                      # OCaml implementations of code from the paper
+--- generic_constant_stack.ml # Thermometer continuations with optimization 1 applied
+--- nondet_int_list.ml        # Replay-based nondeterminism
+
+- sml/                        # SML implementations of code from the paper
+--- baby_thermo.sml           # Code from section 4.2
+--- cont_constant_stack.sml   # Optimization from section 6.1
+--- delim.sml                 # Code from section 4.3
+--- examples.sml              # Code from the top of Section 2, and Section 2.1
+--- filinski.sml              # Code from Section 5.1 and 5.2
+--- gabriel.sml               # Code from Section 2.3 and 2.4
+--- generic_optimized.sml     # Optimizations from sections 6.1 and 6.2
+--- nondet_int_list.sml       # Another implementation of replay-based nondetermism (shortest implementation)
 
 ********************************************************************************
 
@@ -35,7 +102,7 @@ Navigate to /thermocont/benchmarks/parse_failable and run “ruby run_benchmark.
 
 To run INTPARSE_LOCAL benchmarks:
 
-Navigate to /thermocont/benchmarks/parse_failable and run “ruby run_benchmark.rb <name of file> <spacing of bad values>”. Values of <spacing of bad values> used in the aper are 100, 10, 2
+Navigate to /thermocont/benchmarks/parse_recover and run “ruby run_benchmark.rb <name of file> <spacing of bad values>”. Values of <spacing of bad values> used in the aper are 100, 10, 2
 
 ------------------------------------------------
 
@@ -59,5 +126,3 @@ This will populate a latex/ subdirectory with TikZ commands that draw the plot, 
 OTHER NOTES
 
 Note that the versions of OCaml and SML in this Docker image are slightly older than the ones used in the paper, because Ubuntu packages for those versions were unavailable.
-
-We have been having trouble getting Multicore OCaml to run on this machine. The Multicore OCaml / effect handler benchmark hence does not currently run. We have decided to go ahead and make our first submission without this benchmark.

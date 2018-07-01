@@ -6,7 +6,7 @@ RUN echo 'export USE_MLTON="true"' >> /root/.bashrc
 
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends ruby=1:2.5.1 smlnj=110.79-4 libsmlnj-smlnj=110.79-4 gprolog=1.4.5-4.1
-RUN apt-get install -y --no-install-recommends m4=1.4.18-1 git=1:2.17.0-1ubuntu1 mlton=20130715-3 vim=2:8.0.1453-1ubuntu1 make=4.1-9.1ubuntu1
+RUN apt-get install -y --no-install-recommends m4=1.4.18-1 git=1:2.17.1-1ubuntu0.1 mlton=20130715-3 vim=2:8.0.1453-1ubuntu1 make=4.1-9.1ubuntu1
 RUN apt-get install -y --no-install-recommends aspcud=1:1.9.4-1 opam=1.2.2-6
 # Note: aspcud is an optional dependency of opam (a solver for package installation problems)
 # that makes its dependency-solving more reliable.
